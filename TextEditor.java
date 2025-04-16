@@ -5,17 +5,27 @@ class TextEditor {
 
        public static void main(String[] args)
     {
+        List<String> buffer = new ArrayList<String>();
 
         // Creating Scanner class object
-        Scanner scn = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            String input = scanner.nextLine();
+            if (input.equals(":q")) {
+                break;
+            } else {
+                buffer.add(input);
+            }
 
+            
+        }
+        StringBuilder output = new StringBuilder();
+        for (String line : buffer) {
+            output.append(line).append("\n");
+        }
 
-        String b = scn.nextLine();
-
-        // File file = new File("untitled.txt");
-
-        System.out.print(b);
+        System.out.print(output);
 
         // Closing the scanner to release resources
-        scn.close();
+        scanner.close();
     }}
