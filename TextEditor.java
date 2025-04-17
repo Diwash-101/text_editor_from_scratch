@@ -2,9 +2,15 @@ import java.util.*;
 import java.io.*;
 
 class TextEditor {
+    
 
        public static void main(String[] args)
     {
+        try {
+         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor(); // Clear the console (Windows)
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Error clearing console: " + e.getMessage());
+        }
         List<String> buffer = new ArrayList<String>();
 
         // Creating Scanner class object
