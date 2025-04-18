@@ -2,8 +2,6 @@ import java.util.*;
 import java.io.*;
 
 class TextEditor {
-    
-
        public static void main(String[] args)
     {
         try {
@@ -19,7 +17,27 @@ class TextEditor {
             String input = scanner.nextLine();
             if (input.equals(":q")) {
                 break;
-            } else {
+            } else if(input.equals(":w")) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"))) {
+                    for (String line : buffer) {
+                        writer.write(line);
+                        writer.newLine();
+                    }
+                } catch (IOException e) {
+                    System.out.println("Error writing to file: " + e.getMessage());
+                }
+            } else if (input.equals(":r")) {
+                try (BufferedReader reader = new BufferedReader(new FileReader("output.txt"))) {
+                    String line;
+                    buffer.clear(); // Clear the buffer before reading
+                    while ((line = reader.readLine()) != null) {
+                        buffer.add(line);
+                    }
+                } catch (IOException e) {
+                    System.out.println("Error reading from file: " + e.getMessage());
+                }
+            } 
+            else {
                 buffer.add(input);
             }
 
