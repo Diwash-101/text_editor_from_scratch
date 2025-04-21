@@ -13,3 +13,7 @@
 ### 4/18/2025
 
     Implementend the basic read and write functionality to a file using file writer and buffered writer which is apparantly better in processing long files
+
+### 4/20/2025
+
+    Implemented the ablity to edit lines. I can now specify the line number and replace the line. No delete yet.

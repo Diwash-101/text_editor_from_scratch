@@ -2,6 +2,14 @@ import java.util.*;
 import java.io.*;
 
 class TextEditor {
+    public static void showOutput(List<String> buffer) {
+                StringBuilder output = new StringBuilder();
+        for (String line : buffer) {
+            output.append(line).append("\n");
+        }
+
+        System.out.print(output);
+    }
        public static void main(String[] args)
     {
         try {
@@ -33,22 +41,26 @@ class TextEditor {
                     while ((line = reader.readLine()) != null) {
                         buffer.add(line);
                     }
+                    showOutput(buffer); // Display the buffer contents after reading
                 } catch (IOException e) {
                     System.out.println("Error reading from file: " + e.getMessage());
                 }
-            } 
+            } else if (input.equals(":e")) {
+                System.out.println("Enter the line number to edit (1 to " + buffer.size() + ") and the text to replace with: ");
+                int editLine = scanner.nextInt() - 1; // Adjust for 0-based index
+                System.out.println("Enter the new text: ");
+                String editText = scanner.next(); // Read the new text
+                buffer.set(editLine, editText); // Update the buffer with the new text
+                showOutput(buffer); // Display the buffer contents after editing
+            }
             else {
                 buffer.add(input);
             }
 
             
         }
-        StringBuilder output = new StringBuilder();
-        for (String line : buffer) {
-            output.append(line).append("\n");
-        }
 
-        System.out.print(output);
+        showOutput(buffer); // Display the buffer contents
 
         // Closing the scanner to release resources
         scanner.close();
