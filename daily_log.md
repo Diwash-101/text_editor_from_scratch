@@ -21,3 +21,7 @@
 ### 4/22/2025
 
     Implemented the ability to delete lines. A line now can be removed instead of just being replaced by empty text.
+
+### 4/23/2025
+
+    Implemented character by character input instead of line by line for backspace and more granular editing in the future.

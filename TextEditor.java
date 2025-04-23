@@ -2,6 +2,21 @@ import java.util.*;
 import java.io.*;
 
 class TextEditor {
+    public static String charInput() {
+        StringBuilder line = new StringBuilder();
+        try{
+        int ch;
+        while((ch = System.in.read()) != -1) {
+            if(ch == '\n' || ch == '\r') { 
+                break; // Stop reading on newline character
+            }
+            line.append((char)ch); 
+        }}
+        catch(IOException e) {
+            System.out.println("Error reading input: " + e.getMessage());
+        }
+        return line.toString(); // Return the read line as a string
+    }
     public static void showOutput(List<String> buffer) {
                 StringBuilder output = new StringBuilder();
         for (String line : buffer) {
@@ -35,7 +50,7 @@ class TextEditor {
         // Creating Scanner class object
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            String input = scanner.nextLine();
+            String input = charInput();
             if (input.equals(":q")) // Exit command
             {
                 break;
@@ -60,7 +75,7 @@ class TextEditor {
                         if (line.equals("EOF")) { 
                             break; // Stop processing if "EOF" is encountered
                         }
-                        buffer.add(line);
+                        buffer.add(line.replaceFirst("(?s)(.*)EOF", ""));// Remove the last occorunce of "EOF" from the line
                     }
                     showOutput(buffer); // Display the buffer contents after reading
                 } catch (IOException e) {
@@ -71,7 +86,7 @@ class TextEditor {
                 System.out.println("Enter the line number to edit (1 to " + buffer.size() + ") and the text to replace with: ");
                 int editLine = scanner.nextInt() - 1; 
                 System.out.println("Enter the new text: ");
-                String editText = scanner.next(); // Read the new text
+                String editText = scanner.nextLine(); // Read the new text
                 replaceLine(buffer, editLine, editText); // Update the buffer with the new text
                 showOutput(buffer);
             } else if(input.equals(":dd")) // To delete a specific line from the buffer
