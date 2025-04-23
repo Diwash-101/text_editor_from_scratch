@@ -25,3 +25,8 @@
 ### 4/23/2025
 
     Implemented character by character input instead of line by line for backspace and more granular editing in the future.
+
+# BUGS
+
+    - editing adds extra /n
+    - :d command doesn't work (the display function works)
