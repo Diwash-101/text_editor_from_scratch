@@ -26,6 +26,10 @@
 
     Implemented character by character input instead of line by line for backspace and more granular editing in the future.
 
+### 5/2/2025
+
+    Fixed the bug where entering a command added extra lines to the buffer. This happened when entering a command because the main loop would immediately read the enter key used to submit the command as a new input and add it to the buffer creating unwanted empty strings in the buffer. It took a few day on and off but we got there.
+
 # BUGS
 
     - editing adds extra /n

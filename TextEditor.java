@@ -1,122 +1,162 @@
-import java.util.*;
-import java.io.*;
+    import java.util.*;
+    import java.io.*;
 
-class TextEditor {
-    public static String charInput() {
-        StringBuilder line = new StringBuilder();
-        try{
-        int ch;
-        while((ch = System.in.read()) != -1) {
-            if(ch == '\n' || ch == '\r') { 
-                break; // Stop reading on newline character
-            }
-            line.append((char)ch); 
-        }}
-        catch(IOException e) {
-            System.out.println("Error reading input: " + e.getMessage());
-        }
-        return line.toString(); // Return the read line as a string
-    }
-    public static void showOutput(List<String> buffer) {
-                StringBuilder output = new StringBuilder();
-        for (String line : buffer) {
-            if (line.equals("EOF")) { 
-                break; // Stop processing if "/n" is encountered
-            } else {
-                output.append(line).append("\n");
+    class TextEditor {
+        public static void clearConsole() {
+            try {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor(); // Clear the console (Windows)
+            } catch (IOException | InterruptedException e) {
+                System.out.println("Error clearing console: " + e.getMessage());
             }
         }
-
-        System.out.print(output);
-    }
-    public static void replaceLine(List<String> buffer, int editLine, String editText) {
-        // Check if the line number is valid
-        if (editLine < 0 || editLine >= buffer.size()) {
-            System.out.println("Invalid line number.");
-            return;
+        public static String charWiseInput() {
+            StringBuilder line = new StringBuilder();
+            try{
+            int ch;
+            while((ch = System.in.read()) != -1) {
+                if(ch == '\n' || ch == '\r') { 
+                    break; // Stop reading on newline character
+                }
+                line.append((char)ch); 
+            }}
+            catch(IOException e) {
+                System.out.println("Error reading input: " + e.getMessage());
+            }
+            return line.toString(); // Return the read line as a string
         }
-        // Replace the specified line with the new text
-    buffer.set(editLine, editText); // Update the buffer with the new text
-    }
-    public static void main(String[] args)
-    {
-        try {
-         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor(); // Clear the console (Windows)
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Error clearing console: " + e.getMessage());
-        }
-        List<String> buffer = new ArrayList<String>();
+        public static void showOutput(List<String> buffer) {
+            for (String line : buffer) {
+                System.out.print(line); // Append each line to the output
+            }
 
-        // Creating Scanner class object
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            String input = charInput();
-            if (input.equals(":q")) // Exit command
-            {
-                break;
-            } else if(input.equals(":w")) // To write to a file
-            {
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"))) {
-                    for (String line : buffer) {
-                        writer.write(line);
-                        //writer.newLine();
-                    }
-                    writer.write("EOF"); // Indicate end of file
-                } catch (IOException e) {
-                    System.out.println("Error writing to file: " + e.getMessage());
+        }
+        public static void replaceLine(List<String> buffer, int editLine, String editText) {
+            // Check if the line number is valid
+            if (editLine < 0 || editLine >= buffer.size()) {
+                System.out.print("Invalid line number.\n");
+                return;
+            }
+            // Replace the specified line with the new text
+        buffer.set(editLine, editText); // Update the buffer with the new text
+        }
+        public static void saveToFile(List<String> buffer) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"))) {
+                for (String line : buffer) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+            } catch (IOException e) {
+                System.out.println("Error writing to file: " + e.getMessage());
+            }
+        }
+        public static void readFromFile(List<String> buffer) {
+            try (BufferedReader reader = new BufferedReader(new FileReader("output.txt"))) {
+                String line;
+                buffer.clear(); // Clear the buffer before reading
+                while ((line = reader.readLine()) != null) {
+                    buffer.add(line+"\n"); 
+                }
+                showOutput(buffer);
+            } catch (IOException e) {
+                System.out.println("Error reading from file: " + e.getMessage());
+            }
+        }
+        public static void writeToFile(List<String> buffer) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"))) {
+                for (String line : buffer) {
+                    writer.write(line + "\n"); // Write each line to the file
+                    writer.newLine();
                 }
                 
-            } else if (input.equals(":r")) // To read from a file
-            {
-                try (BufferedReader reader = new BufferedReader(new FileReader("output.txt"))) {
-                    String line;
-                    buffer.clear(); // Clear the buffer before reading
-                    while ((line = reader.readLine()) != null) {
-                        if (line.equals("EOF")) { 
-                            break; // Stop processing if "EOF" is encountered
-                        }
-                        buffer.add(line.replaceFirst("(?s)(.*)EOF", ""));// Remove the last occorunce of "EOF" from the line
+            } catch (IOException e) {
+                System.out.println("Error writing to file: " + e.getMessage());
+            }
+        }
+        public static void deleteLine(List<String> buffer, int deleteLine) {
+            // Check if the line number is valid
+            if (deleteLine < 0 || deleteLine >= buffer.size()) {
+                System.out.print("Invalid line number.");
+                return;
+            }
+            // Remove the specified line from the buffer
+            buffer.remove(deleteLine); 
+        }
+        public static void clearBuffer(List<String> buffer) {
+            // Clear the buffer
+            buffer.clear(); 
+        }
+        public static void processCommand(String input, List<String> buffer) {
+            if(input.equals(":w")) 
+                {
+                    writeToFile(buffer);
+                } 
+                else if (input.equals(":r")) // To read from a file
+                {
+                    readFromFile(buffer);
+                } else if (input.equals(":e")) // To edit a specific line in the buffer
+                {
+                    System.out.print("Enter the line number to edit (1 to " + buffer.size()+ "): ");
+                    String editLineInput = charWiseInput(); // Convert to zero-based index
+                    int editLine;
+                    try {
+                        editLine = Integer.parseInt(editLineInput) - 1; // Convert to zero-based index
+                    } catch (NumberFormatException e) {
+                        System.out.print("Invalid line number. Please enter a valid number.");
+                        return;// Skip to the next iteration of the loop
+                    } 
+                    System.out.print("Enter the new text for line " + (editLine + 1) + ": ");
+                    String editText = charWiseInput(); 
+                    replaceLine(buffer, editLine, editText);
+                } else if(input.equals(":dd")) // To delete a specific line from the buffer
+                {
+                    System.out.print("Enter the line number to delete (1 to " + buffer.size()+ "): ");
+                    int deleteLine;
+                    try {
+                        deleteLine = Integer.parseInt(charWiseInput()) - 1; // Convert to zero-based index
+                    } catch (NumberFormatException e) {
+                        System.out.print("Invalid line number. Please enter a valid number.");
+                        return; // Skip to the next iteration of the loop
                     }
-                    showOutput(buffer); // Display the buffer contents after reading
-                } catch (IOException e) {
-                    System.out.println("Error reading from file: " + e.getMessage());
+                    deleteLine(buffer, deleteLine);
+                } else if(input.equals(":c")) // To clear the buffer
+                {
+                   clearBuffer(buffer);
+                } else if(input.equals(":d")) // To display the buffer
+                {
+                    showOutput(buffer);
+                } else if(input.equals(":h")) // for help
+                {
+                    System.out.print("Commands: :q - quit, :w - write, :r - read, :e - edit, :dd - delete, :c - clear, :h - help");
                 }
-            } else if (input.equals(":e")) // To edit a specific line in the buffer
-            {
-                System.out.println("Enter the line number to edit (1 to " + buffer.size() + ") and the text to replace with: ");
-                int editLine = scanner.nextInt() - 1; 
-                System.out.println("Enter the new text: ");
-                String editText = scanner.nextLine(); // Read the new text
-                replaceLine(buffer, editLine, editText); // Update the buffer with the new text
-                showOutput(buffer);
-            } else if(input.equals(":dd")) // To delete a specific line from the buffer
-            {
-                System.out.println("Enter the line number to delete (1 to " + buffer.size()+ "): ");
-                int deleteLine = scanner.nextInt() - 1; 
-                if (deleteLine >= 0 && deleteLine < buffer.size()) {
-                    buffer.remove(deleteLine); // Remove the specified line from the buffer
-                } else {
-                    System.out.println("Invalid line number.");
-                }
-            } else if(input.equals(":c")) // To clear the buffer
-            {
-                buffer.clear(); // Clear the buffer
-            } else if(input.equals(":d")) // To display the buffer
-            {
-                showOutput(buffer); 
-            } else if(input.equals(":h")) // for help
-            {
-                System.out.println("Commands: :q - quit, :w - write, :r - read, :e - edit, :dd - delete, :c - clear, :h - help");
-            }
-            else {
-                buffer.add(input);
-            }
+        }
+        public static void main(String[] args)
+        {
+            clearConsole();
+    List<String> buffer = new ArrayList<>();
+    boolean skipNextEmptyInput = false; // required to skip enter pressed after command
 
-            
+    while (true) {
+        String input = charWiseInput();
+
+        if (skipNextEmptyInput && input.equals("")) {
+            skipNextEmptyInput = false; // reset
+            continue; // skip only this enter
         }
 
-        showOutput(buffer); // Display the buffer contents
+        if (input.startsWith(":")) {
+            if (input.equals(":q")) {
+                break;
+            } else {
+                processCommand(input, buffer);
+                skipNextEmptyInput = true; // set flag to skip next ""
+            }
+            continue;
+        }
 
-        // Closing the scanner to release resources
-        scanner.close();
-    }}
+        // Add actual input (including user-entered blank lines)
+        buffer.add(input);
+    }
+
+    showOutput(buffer);
+    System.out.println(buffer);
+        }}
